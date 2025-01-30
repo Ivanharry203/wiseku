@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Input Hutang</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .btn-outline-primary {
+    color: #000;
+    border-color: #000;
+}
+.btn-outline-primary:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+  </style>
+</head>
+
+<body>
+  
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-start mb-4">
+      <a href="index.html" class="text-decoration-none me-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="stroke-black">
+          <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" d="M15 18l-6-6 6-6"></path>
+        </svg>
+      </a>
+      <h1 class="text-dark m-0">Tentukan Harga Jual</h1>
+    </div>
+    <form id="mainForm">
+      <fieldset>
+        <legend class="text-secondary">Informasi Hutang</legend>
+        <div class="mb-3">
+          <label for="jumlahModal" class="form-label">Jumlah Modal Non Hutang(Rp):</label>
+          <input type="number" id="jumlahModal" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="jumlahHutang" class="form-label">Total Hutang (Rp):</label>
+          <input type="number" id="jumlahHutang" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="bulanPelunasan" class="form-label">Lama Pelunasan (Bulan):</label>
+          <input type="number" id="bulanPelunasan" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="cicilanBulanan" class="form-label">Cicilan Hutang per Bulan (Rp):</label>
+          <input type="number" id="cicilanBulanan" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="pengeluaranKeluarga" class="form-label">Pengeluaran Keluarga Bulanan (Rp):</label>
+          <input type="number" id="pengeluaranKeluarga" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="pengeluaranToko" class="form-label">Pengeluaran Toko Bulanan (Rp):</label>
+          <input type="number" id="pengeluaranToko" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="targetTabungan" class="form-label">Target Tabungan per Bulan (Rp):</label>
+          <input type="number" id="targetTabungan" class="form-control" required>
+        </div>
+      </fieldset>
+    </form>
+
+    <!-- Form Input Barang -->
+    <form id="barangForm" class="mt-4">
+      <fieldset>
+        <legend class="text-secondary">Barang</legend>
+        <div id="barangFields">
+          <div class="barang-row row g-3">
+            <div class="col-4">
+              <input type="text" name="namaBarang" class="form-control" placeholder="Nama Barang" required>
+            </div>
+            <div class="col-4">
+              <input type="number" name="jumlahBarang" class="form-control" placeholder="Jumlah Barang" min="1" required>
+            </div>
+            <div class="col-4">
+              <input type="number" name="hargaSatuan" class="form-control" placeholder="Harga Satuan (Rp)" min="1" required>
+            </div>
+            <div class="col-2 text-center">
+              <button type="button" class="btn btn-danger btn-sm removeBarang">❌</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" id="addBarang" class="btn btn-outline-primary mt-3 w-100" >Tambah Barang</button>
+      </fieldset>
+      <button type="submit" id="submitData" class="btn btn-dark mt-4 w-100">Hitung Harga Jual</button>
+    </form>
+  </div>
+
+  <!-- Output Table -->
+  <div id="outputContainer" class="container mt-4">
+    <h2 class="text-center text-success">Hasil Perhitungan Harga Jual</h2>
+    <div class="table-responsive">
+      <table id="outputTable" class="table table-sm table-striped table-bordered text-center mt-3">
+        <thead class="table-light">
+          <tr>
+            <th>Nama Barang</th>
+            <th>Jumlah</th>
+            <th>Harga Satuan</th>
+            <th>Rekomendasi Harga Jual</th>
+            <th>Persentase Laba</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="table-responsive mt-4">
+      <table id="profitTable" class="table table-sm table-striped table-bordered text-center">
+        <thead class="table-light">
+          <tr>
+            <th>Laba Kotor (Rp)</th>
+            <th>Laba Bersih (Rp)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="labaKotor">-</td>
+            <td id="labaBersih">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

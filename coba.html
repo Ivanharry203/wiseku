@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Catatan Utang</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .debt-card { cursor: pointer; }
+        .overdue { background-color: #ffcccc !important; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="d-flex align-items-center justify-content-start mb-4">
+            <a href="index.html" class="text-decoration-none me-a2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="stroke-black">
+                <path stroke-linejoin="round" stroke-linecap="round" stroke-width="2" d="M15 18l-6-6 6-6"></path>
+              </svg>
+            </a>
+            <h1 class="text-dark m-0">Catatan Hutang</h1>
+        </div>
+        <div class="row" id="debt-list">
+            <div class="col-6 col-md-4 mb-3">
+                <button class="btn btn-outline-dark w-100 h-100" onclick="showForm()">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="debtModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Utang</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="nama" class="form-control mb-2" placeholder="Nama Penghutang">
+                    <input type="text" id="hp" class="form-control mb-2" placeholder="Nomor HP">
+                    <input type="text" id="alamat" class="form-control mb-2" placeholder="Alamat">
+                    <input type="number" id="nominal" class="form-control mb-2" placeholder="Nominal Hutang">
+                    <input type="date" id="tanggal" class="form-control mb-2">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="saveDebt()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="infoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Utang</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="debtDetails"></div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", loadDebts);
+
+        function showForm() {
+            const modal = new bootstrap.Modal(document.getElementById('debtModal'));
+            modal.show();
+        }
+
+        function saveDebt() {
+            const debt = {
+                nama: document.getElementById('nama').value,
+                hp: document.getElementById('hp').value,
+                alamat: document.getElementById('alamat').value,
+                nominal: document.getElementById('nominal').value,
+                tanggal: document.getElementById('tanggal').value
+            };
+            
+            let debts = JSON.parse(localStorage.getItem('debts')) || [];
+            debts.push(debt);
+            localStorage.setItem('debts', JSON.stringify(debts));
+            loadDebts();
+            bootstrap.Modal.getInstance(document.getElementById('debtModal')).hide();
+        }
+
+        function loadDebts() {
+            const debtList = document.getElementById('debt-list');
+            debtList.innerHTML = '<div class="col-6 col-md-4 mb-3"><button class="btn btn-outline-dark w-100 h-100" onclick="showForm()">+</button></div>';
+
+            let debts = JSON.parse(localStorage.getItem('debts')) || [];
+            debts.sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+            const today = new Date().toISOString().split('T')[0];
+            let overdueCount = 0;
+
+            debts.forEach((debt, index) => {
+                const overdueClass = today > debt.tanggal ? 'overdue' : '';
+                if (overdueClass) overdueCount++;
+
+                const card = document.createElement('div');
+                card.className = `col-6 col-md-4 mb-3`;
+                card.innerHTML = `<div class="card debt-card ${overdueClass}" onclick="showDebt(${index})">
+                                    <div class="card-body text-center">
+                                        <h6>${debt.nama}</h6>
+                                        <small>${debt.tanggal}</small>
+                                        <button class="btn btn-danger btn-sm mt-2" onclick="deleteDebt(event, ${index})">Hapus</button>
+                                    </div>
+                                </div>`;
+                debtList.appendChild(card);
+            });
+
+            
+            if (overdueCount > 0) showNotification();
+        }
+
+        
+        function showNotification() {
+            let toast = new bootstrap.Toast(document.getElementById('debtToast'));
+            toast.show();
+        }
+
+        function showDebt(index) {
+            let debts = JSON.parse(localStorage.getItem('debts')) || [];
+            document.getElementById('debtDetails').innerHTML = `
+                <p><strong>Nama:</strong> ${debts[index].nama}</p>
+                <p><strong>HP:</strong> ${debts[index].hp}</p>
+                <p><strong>Alamat:</strong> ${debts[index].alamat}</p>
+                <p><strong>Nominal:</strong> ${debts[index].nominal}</p>
+                <p><strong>Jatuh Tempo:</strong> ${debts[index].tanggal}</p>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('infoModal'));
+            modal.show();
+        }
+
+        function deleteDebt(event, index) {
+            event.stopPropagation();
+            let debts = JSON.parse(localStorage.getItem('debts')) || [];
+            debts.splice(index, 1);
+            localStorage.setItem('debts', JSON.stringify(debts));
+            loadDebts();
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+buatlah agar proses notifikasi berjalan dengan baik pada perangkat mobile user dan bisa muncul di berdanda tampilan hp user

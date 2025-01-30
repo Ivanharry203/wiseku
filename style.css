@@ -1,0 +1,268 @@
+/* Global Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f3f4f6;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Container Styling */
+.container {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Header Styles */
+h1 {
+  text-align: center;
+  font-size: 22px;
+  color: #0056b3;
+  margin-bottom: 15px;
+}
+
+/* Label and Input Styling */
+label {
+  font-weight: 500;
+  font-size: 12px; /* Ukuran font lebih kecil */
+  color: #555;
+  display: block;
+  margin-bottom: 4px;
+}
+
+input {
+  width: 100%;
+  background: white;
+  padding: 10px;
+  font-size: 14px;
+  height: 36px; /* Sama dengan input atas */
+  border-radius: 6px; /* Menyamakan bentuk */
+  box-shadow: inset 2px 2px 4px #cbced1, inset -2px -2px 4px white;
+  border: 1px solid #ccc;
+}
+
+input:focus {
+  border-color: #161616;
+  outline: none;
+  box-shadow: 0 0 4px rgba(219, 219, 219, 0.4);
+}
+
+/* Barang Row Styling */
+.barang-row {
+  display: flex;
+  gap: 10px;
+  align-items: center; /* Menyamakan tinggi */
+}
+
+.barang-row div {
+  flex: 1;
+}
+
+/* Fieldset Styling */
+fieldset {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+}
+
+legend {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Button Styling */
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #161616;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #161616;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Table Styling */
+#outputTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#outputTable thead {
+  background-color: #161616;
+  color: white;
+}
+
+#outputTable th,
+#outputTable td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+#outputTable tbody tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+#outputTable tbody tr:nth-child(even) {
+  background-color: #eef2f7;
+}
+
+/* Summary Styling */
+#summary {
+  margin-top: 20px;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#summary h3 {
+  margin-bottom: 10px;
+  color: #161616;
+  font-size: 16px;
+}
+
+#summary p {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .barang-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .barang-row div {
+    flex: 1;
+    min-width: 80px;
+  }
+
+  input {
+    font-size: 12px;
+    height: 34px;
+  }
+
+  label {
+    font-size: 10px;
+  }
+}
+
+h1, h2, h3, h4, h5, h6, p, label, input, button, table {
+  font-family: 'Poppins', sans-serif;
+}
+/* Styling untuk seluruh input agar bentuknya seragam */
+.form-control {
+  border-radius: 10px; 
+  font-size: 10px; 
+  padding: 10px; 
+}
+
+/* Styling khusus untuk input pada bagian atas (Informasi Hutang) */
+#mainForm .form-control {
+  font-size: 14px; /* Ukuran font lebih kecil */
+}
+.btn-danger {
+  width: 100%;
+}
+#splash {
+  background: #fff;
+  background-repeat: repeat-y;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  animation: splash 3s ease-in;
+  animation-fill-mode: forwards;
+  -webkit-animation-fill-mode: forwards;
+}
+
+#loader {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%,0);
+}
+
+#loader:after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  margin-left: -8px;
+  bottom: -170px;
+  width: 3px;
+  background: #fff;
+  background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
+  height: 200px;
+}
+
+#loader:before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  margin-left: 8px;
+  bottom: -190px;
+  width: 3px;
+  background: #000;
+  background: linear-gradient(to bottom, rgba(0,0,0,.2) 0%, rgba(0,0,0,.2) 50%, rgba(0,0,0,0) 100%);
+  height: 200px;
+}
+
+#splash .anim {
+  height: 100%;
+  position: absolute;
+  left: 50%;
+  width: 100px;
+  transform: translate(-50%,100%);
+  animation: loader 4s linear;
+  animation-fill-mode: forwards;
+  -webkit-animation-fill-mode: forwards;
+}
+
+@keyframes loader {
+  0% {
+    transform: translate(-50%,110%);
+  }
+  30% {
+    transform: translate(-50%,50%);
+  }
+  100% {
+    transform: translate(-50%,0%);
+  }
+}
+
+@keyframes splash {
+  0% {
+    transform: translate(0%,0%);
+  }
+  50% {
+    transform: translate(0%,0%);
+  }
+  100% {
+    transform: translate(0%,-100%);
+  }
+}
