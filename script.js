@@ -1,86 +1,122 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const addBarangButton = document.getElementById("addBarang");
-  const barangFields = document.getElementById("barangFields");
-  const barangForm = document.getElementById("barangForm");
-  const outputTableBody = document.querySelector("#outputTable tbody");
-  const labaKotorElement = document.getElementById("labaKotor");
-  const labaBersihElement = document.getElementById("labaBersih");
+    const addBarangButton = document.getElementById("addBarang");
+    const barangFields = document.getElementById("barangFields");
+    const barangForm = document.getElementById("barangForm");
+    const outputTableBody = document.querySelector("#outputTable tbody");
+    const labaKotorElement = document.getElementById("labaKotor");
+    const labaBersihElement = document.getElementById("labaBersih");
+  
 
-  addBarangButton.addEventListener("click", function () {
+    function formatRupiah(angka) {
+      return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+  
+    function parseRupiah(rupiah) {
+      return parseFloat(rupiah.replace(/\./g, "").replace(/,/g, ".")) || 0;
+    }
+  
+    async function fetchHargaReferensi(namaBarang) {
+      try {
+        const responses = await Promise.all([
+          fetch(`https://sip.kemendag.go.id/api/harga?barang=${encodeURIComponent(namaBarang)}`),
+          fetch(`https://hargapangan.id/api/harga?barang=${encodeURIComponent(namaBarang)}`),
+          fetch(`https://sisp.kemendag.go.id/api/harga?barang=${encodeURIComponent(namaBarang)}`),
+          fetch(`https://infopangan.jakarta.go.id/api/harga?barang=${encodeURIComponent(namaBarang)}`)
+        ]);
+  
+        const data = await Promise.all(responses.map(res => res.json()));
+        const hargaList = data.map(item => item.harga || 0).filter(harga => harga > 0);
+  
+        if (hargaList.length > 0) {
+          const avgHarga = hargaList.reduce((a, b) => a + b, 0) / hargaList.length;
+          return avgHarga;
+        } else {
+          return null;
+        }
+      } catch (error) {
+        console.error("Error fetching harga referensi:", error);
+        return null;
+      }
+    }
+  
+    addBarangButton.addEventListener("click", function () {
       const newRow = document.createElement("div");
       newRow.classList.add("barang-row", "row", "g-3");
       newRow.innerHTML = `
-          <div class="col-4">
-              <input type="text" name="namaBarang" class="form-control" placeholder="Nama Barang" required>
-          </div>
-          <div class="col-4">
-              <input type="number" name="jumlahBarang" class="form-control" placeholder="Jumlah Barang" min="1" required>
-          </div>
-          <div class="col-4">
-              <input type="number" name="hargaSatuan" class="form-control" placeholder="Harga Satuan (Rp)" min="1" required>
-          </div>
-          <div class="col-2 text-center">
-              <button type="button" class="btn btn-danger btn-sm removeBarang">❌</button>
-          </div>
+        <div class="col-4">
+          <input type="text" name="namaBarang" class="form-control" placeholder="Nama Barang" required>
+        </div>
+        <div class="col-4">
+          <input type="text" name="jumlahBarang" class="form-control jumlah-barang" placeholder="Jumlah Barang" required>
+        </div>
+        <div class="col-4">
+          <input type="text" name="hargaSatuan" class="form-control harga-satuan" placeholder="Harga Satuan (Rp)" required>
+        </div>
+        <div class="col-2 text-center">
+          <button type="button" class="btn btn-danger btn-sm removeBarang">❌</button>
+        </div>
       `;
       barangFields.appendChild(newRow);
-  });
-
-  barangFields.addEventListener("click", function (event) {
+    });
+  
+    barangFields.addEventListener("click", function (event) {
       if (event.target.classList.contains("removeBarang")) {
-          event.target.closest(".barang-row").remove();
+        event.target.closest(".barang-row").remove();
       }
-  });
-
-  barangForm.addEventListener("submit", function (event) {
+    });
+  
+    barangFields.addEventListener("input", function (event) {
+      if (event.target.classList.contains("harga-satuan") || event.target.classList.contains("jumlah-barang")) {
+        const value = event.target.value.replace(/\D/g, "");
+        event.target.value = formatRupiah(value);
+      }
+    });
+  
+    barangForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       outputTableBody.innerHTML = "";
-
-      const jumlahModal = parseFloat(document.getElementById("jumlahModal").value) || 0;
-      const jumlahHutang = parseFloat(document.getElementById("jumlahHutang").value) || 0;
-      const bulanPelunasan = parseFloat(document.getElementById("bulanPelunasan").value) || 1;
-      const cicilanBulanan = parseFloat(document.getElementById("cicilanBulanan").value) || 0;
-      const pengeluaranKeluarga = parseFloat(document.getElementById("pengeluaranKeluarga").value) || 0;
-      const pengeluaranToko = parseFloat(document.getElementById("pengeluaranToko").value) || 0;
-      const targetTabungan = parseFloat(document.getElementById("targetTabungan").value) || 0;
-
-      const totalKewajibanBulanan = cicilanBulanan + pengeluaranKeluarga + pengeluaranToko + targetTabungan;
-      const totalModal = jumlahModal + jumlahHutang;
-      let totalHargaModal = 0;
-      let barangData = [];
-
-      document.querySelectorAll(".barang-row").forEach(row => {
-          const namaBarang = row.querySelector("input[name='namaBarang']").value;
-          const jumlahBarang = parseFloat(row.querySelector("input[name='jumlahBarang']").value) || 1;
-          const hargaSatuan = parseFloat(row.querySelector("input[name='hargaSatuan']").value) || 0;
-          const totalHarga = jumlahBarang * hargaSatuan;
-          totalHargaModal += totalHarga;
-
-          barangData.push({ namaBarang, jumlahBarang, hargaSatuan, totalHarga });
-      });
-
-      const labaDibutuhkanPerBulan = totalKewajibanBulanan / bulanPelunasan;
-      const persentaseLaba = (labaDibutuhkanPerBulan / totalModal) * 100;
+  
+      const totalKewajibanBulanan = [
+        "cicilanBulanan", "pengeluaranKeluarga", "pengeluaranToko", "targetTabungan"
+      ].reduce((acc, id) => acc + parseRupiah(document.getElementById(id).value), 0);
+  
       let labaKotor = 0;
-
-      barangData.forEach(({ namaBarang, jumlahBarang, hargaSatuan, totalHarga }) => {
-          let rekomendasiHargaJual = hargaSatuan + (hargaSatuan * (persentaseLaba / 100));
-          let totalHargaJual = jumlahBarang * rekomendasiHargaJual;
-          labaKotor += totalHargaJual - totalHarga;
-
-          const row = document.createElement("tr");
-          row.innerHTML = `
-              <td>${namaBarang}</td>
-              <td>${jumlahBarang}</td>
-              <td>Rp ${hargaSatuan.toLocaleString()}</td>
-              <td>Rp ${rekomendasiHargaJual.toFixed(2).toLocaleString()}</td>
-              <td>${persentaseLaba.toFixed(2)}%</td>
-          `;
-          outputTableBody.appendChild(row);
-      });
-
+  
+      const barangRows = document.querySelectorAll(".barang-row");
+      for (const row of barangRows) {
+        const namaBarang = row.querySelector("input[name='namaBarang']").value;
+        const jumlahBarang = parseRupiah(row.querySelector("input[name='jumlahBarang']").value) || 1;
+        const hargaSatuan = parseRupiah(row.querySelector("input[name='hargaSatuan']").value) || 0;
+  
+        const hargaReferensi = await fetchHargaReferensi(namaBarang);
+        let marginProfit = 0.2;
+  
+        if (hargaReferensi) {
+          marginProfit = hargaSatuan < hargaReferensi ? 0.25 : 0.15;
+        } else if (hargaSatuan > 100000) {
+          marginProfit = 0.25;
+        } else if (hargaSatuan < 50000) {
+          marginProfit = 0.15;
+        }
+  
+        const rekomendasiHargaJual = hargaSatuan + (hargaSatuan * marginProfit);
+        const totalHargaJual = jumlahBarang * rekomendasiHargaJual;
+        labaKotor += totalHargaJual - (jumlahBarang * hargaSatuan);
+  
+        const rowElement = document.createElement("tr");
+        rowElement.innerHTML = `
+          <td>${namaBarang}</td>
+          <td>${formatRupiah(jumlahBarang)}</td>
+          <td>Rp ${formatRupiah(hargaSatuan)}</td>
+          <td>Rp ${formatRupiah(rekomendasiHargaJual.toFixed(0))}</td>
+          <td>${(marginProfit * 100).toFixed(2)}%</td>
+        `;
+        outputTableBody.appendChild(rowElement);
+      }
+  
       const labaBersih = labaKotor - totalKewajibanBulanan;
-      labaKotorElement.textContent = `Rp ${labaKotor.toLocaleString()}`;
-      labaBersihElement.textContent = `Rp ${labaBersih.toLocaleString()}`;
+      labaKotorElement.textContent = `Rp ${formatRupiah(labaKotor.toFixed(0))}`;
+      labaBersihElement.textContent = `Rp ${formatRupiah(labaBersih.toFixed(0))}`;
+    });
   });
-});
+  
